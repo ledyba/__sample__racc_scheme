@@ -1,0 +1,56 @@
+class Parser
+token IDENT NUMBER STRING S_START S_END S_QUOTE
+rule
+	program:
+		s_exp_list
+			{
+				result = val[0];
+			}
+		|
+			{
+				result = [];
+			}
+		;
+	s_exp_list:
+		s_exp s_exp_list
+			{
+				result = [val[0], *val[1]]
+			}
+		| s_exp
+			{
+				result = [val[0]]
+			}
+		;
+	s_exp:
+		S_QUOTE S_START expr_list S_END
+			{
+				result = val[2];
+			}
+		|S_START expr_list S_END
+			{
+				result = val[1];
+			}
+		;
+
+	expr_list:
+		expr expr_list
+			{
+				result =  [val[0], *val[1]]
+			}
+		| expr
+			{
+				result = [val[0]]
+			}
+		;
+	expr:
+		IDENT
+		| NUMBER
+		| STRING
+		| s_exp
+		;
+end
+---- header
+require File.dirname(__FILE__)+"/parser_inner.rb"
+---- inner
+include ParserInner
+
